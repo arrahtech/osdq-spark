@@ -1,0 +1,170 @@
+{
+  "sparkconfig": 
+    {
+      "appname": "TransformRunner",
+      "master":"local[3]",
+      "verbose":"true",
+      "noexecutor":"3",
+      "nocore":"3",
+      "executormemory":"3G"
+    },
+  "datasources": [
+    {
+      "name": "SampleData",
+      "location":"/Users/vsingh007c/Downloads/drive-download-20180718T060717Z-001/cdc/modified.csv",
+      "locationType": "static",
+      "format": "csv",
+      "selectedColumns": []
+    }
+  ],
+  "transformations": [
+    {
+      "name": "SampleData",
+      "type": "sampling",
+      "source": "SampleData",
+      "priority": 1,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "random",
+          "value": ["0.20"]
+        }
+      ]
+    },
+    {
+      "name": "SampleData",
+      "type": "transformation",
+      "source": "SampleData",
+      "priority": 2,
+      "cache": false,
+      "conditions": [
+        {
+          "condition":"UDF",
+          "funcname":"concat",
+          "value": [ "col1","col2"],
+          "column": "testcolumnUDF",
+          "datatype": "string"
+        },
+        {
+          "condition":"UDF",
+          "funcname":"tolower",
+          "value": ["testcolumnUDF"],
+          "column": "LowertestcolumnUDF",
+          "datatype": "string"
+        },
+        {
+          "condition":"UDF",
+          "funcname":"tolong",
+          "value": ["LowertestcolumnUDF"],
+          "column": "longLowertestcolumnUDF",
+          "datatype": "Long"
+        },
+        {
+          "condition":"normalise",
+          "funcname":"zeroscore",
+          "value": ["col10"],
+          "column": "normcol10",
+          "datatype": "Long"
+        },
+        {
+          "condition":"normalise",
+          "funcname":"zscore",
+          "value": ["col10"],
+          "column": "zcol10",
+          "datatype": "Long"
+        }
+      ]
+    },
+    {
+      "name": "SampleData-Filter",
+      "type": "filter",
+      "source": "SampleData",
+      "priority": 3,
+      "cache": false,
+      "conditions": [
+        {
+          "column": "col10",
+          "condition": "GREATER",
+          "value": ["variable","datenow","yyyy"],
+          "datatype": "Long"
+        }
+      ]
+    },
+    {
+      "name": "SampleData",
+      "type": "enrichment",
+      "source": "SampleData",
+      "priority": 4,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "addcolumns",
+          "aggrcondition": "testcolumn1:trim(col10):substrcol1:substr(now(),1,4):newcolumn:concat(testcolumn1,col4)"
+        }
+      ]
+    },
+    {
+      "name": "SampleData",
+      "type": "enrichment",
+      "source": "SampleData",
+      "priority": 8,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "renamecolumns",
+          "aggrcondition": "testcolumn1,rename1,substrcol1,rename2,newcolumn,rename3"
+        }
+      ]
+    },
+    {
+      "name": "SampleData",
+      "type": "join",
+      "source": "SampleData,SampleData",
+      "priority": 5,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "Unionall"
+        }
+      ]
+    },
+    {
+      "name": "Groupdata",
+      "type": "aggregate",
+      "source": "StratifiedData",
+      "priority": 7,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "groupby",
+          "value": [ "col2"],
+          "aggrcondition": "col2,count"
+        }
+      ]
+    },
+    {
+      "name": "StratifiedData",
+      "type": "sampling",
+      "source": "SampleData",
+      "priority": 6,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "stratified",
+          "value": ["0.002","I","0.8"],
+          "column": "col2"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "BASE_TABLE",
+      "location": "/Users/vsingh007c/Downloads/",
+      "sources": ["UDFData-Filter-newCol"],
+      "format": "parquet",
+      "savemode": "append",
+      "selectedColumns": []
+    }
+  ]
+}

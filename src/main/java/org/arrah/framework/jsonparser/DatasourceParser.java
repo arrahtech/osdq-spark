@@ -18,7 +18,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "location",
     "locationType",
     "format",
-    "selectedColumns"
+    "selectedColumns",
+    "jdbcparam",
+    "header"
 })
 public class DatasourceParser implements Serializable
 {
@@ -33,6 +35,10 @@ public class DatasourceParser implements Serializable
     private String format;
     @JsonProperty("selectedColumns")
     private List<String> selectedColumns = null;
+    @JsonProperty("jdbcparam")
+    private String jdbcparam = null;
+    @JsonProperty("header")
+    private String header = "";
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private final static long serialVersionUID = -3915093323505565328L;
@@ -85,6 +91,26 @@ public class DatasourceParser implements Serializable
     @JsonProperty("selectedColumns")
     public void setSelectedColumns(List<String> selectedColumns) {
         this.selectedColumns = selectedColumns;
+    }
+    
+    @JsonProperty("jdbcparam")
+    public String getJdbcParam() {
+        return jdbcparam;
+    }
+
+    @JsonProperty("jdbcparam")
+    public void setJdbcParam(String jdbcparam) {
+        this.jdbcparam = jdbcparam;
+    }
+    
+    @JsonProperty("header")
+    public String getHeader() {
+        return header;
+    }
+
+    @JsonProperty("header")
+    public void setHeader(String header) {
+        this.header = header;
     }
 
     @JsonAnyGetter

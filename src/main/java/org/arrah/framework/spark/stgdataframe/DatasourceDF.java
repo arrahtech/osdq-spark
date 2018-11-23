@@ -19,8 +19,8 @@ public class DatasourceDF {
 	
 	public Dataset<Row>  getDataFrame(SparkSession sqlContext){
 		
-		Dataset<Row>  df = SparkHelper.getDataFrame(sqlContext, ds.getFormat(), ds.getLocation(),ds.getSelectedColumns());
-	//	DataFrame df = SparkHelper.getDataFrame(sqlContext, ds.getFormat(), ds.getLocation());		
+		Dataset<Row>  df = SparkHelper.getDataFrame(sqlContext, ds);
+		// Dataset<Row>  df = SparkHelper.getDataFrame(sqlContext, ds.getFormat(), ds.getLocation(),ds.getSelectedColumns());	
 	return df;	
 		
 	}

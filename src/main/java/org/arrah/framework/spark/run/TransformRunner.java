@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
@@ -12,7 +13,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-
 import org.arrah.framework.inputvalidators.TransformRunnerValidator;
 import org.arrah.framework.jsonparser.DatasourceParser;
 import org.arrah.framework.jsonparser.OutputParser;
@@ -96,6 +96,15 @@ public class TransformRunner implements Serializable {
 			if (param != null && "".equals(param) ==false)
 				conf = conf.set("spark.executor.memory", param);
 			
+			param = scp.getConfparam();
+			if (param != null && param.isEmpty() == false) {
+				Map<String,Object> confhash = SparkHelper.toHashmap(param.split(","), 2);
+				for (String s:confhash.keySet())  { // set  params
+					conf = conf.set(s, confhash.get(s).toString());
+					// System.out.println(s + ":" + confhash.get(s).toString());
+				}
+			}
+			
 		} catch (Exception e) {
 			System.out.println(e.getLocalizedMessage());
 			logger.warning("Failed to read spark config json - setting default");
@@ -108,11 +117,12 @@ public class TransformRunner implements Serializable {
 			      .set("spark.executor.memory","2g");
 		// 2 cores on each workers 4 executor 2g memory 4 threads
 
+		conf.set("spark.sql.parquet.binaryAsString","true"); // Use as string -- should come from config file
 		SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 		//JavaSparkContext javaSparkContext = new JavaSparkContext(spark.sparkContext());
-		conf.set("spark.sql.parquet.binaryAsString","true"); // Use as string -- should come from config file
+		
 
-		spark.sparkContext().setLogLevel("ERROR");
+		spark.sparkContext().setLogLevel("WARN");
 
 		
 		HashMap<String, Dataset<Row>> dataFramesMap = new HashMap<>();
@@ -158,6 +168,7 @@ public class TransformRunner implements Serializable {
 						for (String key: dataFramesMap.keySet()) {
 							System.out.println(key);
 							dataFramesMap.get(key).show();
+							//dataFramesMap.get(key).explain();;
 							
 						}
 					}

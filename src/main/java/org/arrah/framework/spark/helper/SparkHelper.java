@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
+import org.arrah.framework.jsonparser.DatasourceParser;
 
 public class SparkHelper {
 
@@ -50,7 +52,29 @@ public class SparkHelper {
 		return null;
 	}
 
-	public static Dataset<Row> getDataFrame(SparkSession sqlContext, String format, String inputPath) {
+	// This function for JDBC
+	private static Dataset<Row> getDataFrameJDBC(SparkSession sqlContext, DatasourceParser ds) {
+	
+		try {
+			DataFrameReader dataFrameR = sqlContext.read().format("jdbc");
+			String jdbcparam = ds.getJdbcParam();
+			if (jdbcparam != null && jdbcparam.isEmpty() == false) {
+			Map<String,Object> confhash = SparkHelper.toHashmap(jdbcparam.split(","), 2);
+				for (String s:confhash.keySet())  { // set  params
+					dataFrameR = dataFrameR.option(s, confhash.get(s).toString());
+					// System.out.println(s + ":" + confhash.get(s).toString());
+				}
+			}
+			
+			return dataFrameR.load();
+		} catch (Exception e) {
+			logger.severe(("Exception in get Dataframe util - " + e.getMessage()));
+		}
+		return null;
+	}
+	
+	/***
+	private static Dataset<Row> getDataFrame(SparkSession sqlContext, String format, String inputPath) {
 
 		Dataset<Row> dataFrame = null;
 		String localheader = "false";
@@ -82,11 +106,36 @@ public class SparkHelper {
 		}
 		return null;
 	}
-
-	public static Dataset<Row> getDataFrame(SparkSession sqlContext, String format, String inputPath,
+	**/
+ 
+	/**  Depreacated - no more in use  -- Dataset<Row> getDataFrame(SparkSession sqlContext, DatasourceParser ds)
+	private static Dataset<Row> getDataFrame(SparkSession sqlContext, String format, String inputPath,
 			List<String> selectedColumns) {
 
 		return getSelectedColumns(getDataFrame(sqlContext, format, inputPath), selectedColumns);
+	}
+	**/
+	
+	// To pass more infor
+	public static Dataset<Row> getDataFrame(SparkSession sqlContext, DatasourceParser ds) {
+		if (ds == null)  {
+			logger.severe("Could not process DataFrame:");
+			return null;
+		}
+		
+		String format = ds.getFormat();
+		if (format == null || "".equals(format)) {
+			logger.severe("Could not process Format:");
+			return null;
+		}
+		String header = ds.getHeader();
+		
+		if (format.compareToIgnoreCase("jdbc") == 0) {
+			return getSelectedColumns(getDataFrameJDBC(sqlContext, ds), ds.getSelectedColumns());
+		} else if (header == null || "".equals(header))// if not jdbc old call with header /without header
+			return getSelectedColumns(getDataFrame(sqlContext, format, ds.getLocation(),"true"), ds.getSelectedColumns());
+		else
+			return getSelectedColumns(getDataFrame(sqlContext, format, ds.getLocation(),header), ds.getSelectedColumns());
 	}
 	
 	public static List<String> requiredCoulmns(List<String> columnList , List<String> selectedColumns) {
@@ -187,6 +236,10 @@ public class SparkHelper {
 				dt= DataTypes.IntegerType;
 			else if (rdataType.equalsIgnoreCase("date"))
 				dt= DataTypes.DateType;
+			else if (rdataType.equalsIgnoreCase("float"))
+				dt= DataTypes.FloatType;
+			else if (rdataType.equalsIgnoreCase("decimal"))
+				dt= DataTypes.createDecimalType();
 			else
 				dt= DataTypes.StringType; // default
 		}

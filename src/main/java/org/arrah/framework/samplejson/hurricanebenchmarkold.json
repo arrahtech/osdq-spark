@@ -1,0 +1,108 @@
+{
+  "sparkconfig": 
+    {
+      "appname": "TransformRunner",
+      "master":"local[3]",
+      "noexecutor":"3",
+      "nocore":"3",
+      "executormemory":"3G"
+    },
+  "datasources": [
+    {
+      "name": "ORIG",
+      "location":"/Users/vsingh007c/Downloads/drive-download-20180718T060717Z-001/hrc_fase_f41021_reconcile/e6437f77940289ff-6728124c00000002_687922301_data.0.parq",
+      "locationType": "static",
+      "format": "parquet",
+      "selectedColumns": []
+    },
+    {
+      "name": "DELTA",
+      "location":"/Users/vsingh007c/Downloads/drive-download-20180718T060717Z-001/cdc/modified.csv",
+      "locationType": "static",
+      "format": "csv",
+      "selectedColumns": []
+    }
+  ],
+  "transformations": [
+    {
+      "name": "ORIG-DELTA-JOIN",
+      "type": "join",
+      "source": "ORIG,DELTA",
+      "priority": 1,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "leftouter",
+          "leftcolumn": "liitm",
+          "condition": "equal",
+          "rightcolumn": "col3",
+          "dropcolumn": "right"
+        }
+      ]
+    },
+    {
+      "name": "Groupdata",
+      "type": "aggregate",
+      "source": "ORIG-DELTA-JOIN",
+      "priority": 2,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "groupby",
+          "value": [ "liitm","lilocn","lilotn","limcu"],
+          "aggrcondition": "di_sequence_number,max"
+        }
+      ]
+    },
+    {
+      "name": "Cleandata",
+      "type": "enrichment",
+      "source": "Groupdata",
+      "priority": 3,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "nullreplace",
+          "aggrcondition": "testcolumn,1"
+        }
+      ]
+    },
+    {
+      "name": "UDFdata",
+      "type": "transformation",
+      "source": "Cleandata",
+      "priority": 4,
+      "cache": false,
+      "conditions": [
+        {
+          "condition":"UDF",
+          "value": [ "liitm","lilocn"],
+          "column": "testcolumnUDF",
+          "datatype": "string"
+        }
+      ]
+    },
+    {
+      "name": "ProfileDF",
+      "type": "profile",
+      "source": "Cleandata",
+      "priority": 5,
+      "cache": false,
+      "conditions": [
+        {
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "STB-BASE_TABLE",
+      "location": "/mapr/ATHENA-AS-S/user/jsonFramework/dynamic/",
+      "sources": [
+        "STB-PN-JOIN"
+      ],
+      "format": "parquet",
+      "selectedColumns": []
+    }
+  ]
+}

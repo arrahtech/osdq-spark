@@ -2,6 +2,7 @@ package org.arrah.framework.spark.stgdataframe;
 
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
@@ -62,7 +63,47 @@ public class FilterDF {
 			
 			filterDF = df.where(df.col(c.getColumn()).cast(dt).lt(newValue.get(0)));
 		
-		} else {
+		} else if (condition.equalsIgnoreCase("LIKE")) {
+			
+			filterDF = df.where(df.col(c.getColumn()).cast(dt).like(newValue.get(0).toString()));
+		
+		} else if (condition.equalsIgnoreCase("RLIKE")) {
+			
+			filterDF = df.where(df.col(c.getColumn()).cast(dt).rlike(newValue.get(0).toString()));
+		
+		}  else if (condition.equalsIgnoreCase("DROPDUPLICATES")) {
+			if (newValue == null || newValue.isEmpty() == true)
+				filterDF = df.dropDuplicates();
+			else {
+				String[] str = new String[newValue.size()];
+				filterDF = df.dropDuplicates(newValue.toArray(str));
+			}
+		} else if (condition.equalsIgnoreCase("SELECTEXPR")) {
+			
+				String[] str = new String[newValue.size()];
+				filterDF = df.selectExpr(newValue.toArray(str));
+		}
+		else if (condition.equalsIgnoreCase("EXPRESSION")) {
+			
+			filterDF = df.where(newValue.get(0).toString());
+		
+		}  else if (condition.equalsIgnoreCase("COLNAMEFROMFILE")) {
+			
+			String[] colNames = df.columns();
+			filterDF = df;
+			int i=0;
+			int outlen = newValue.size();
+			for (String colName:colNames) {
+				if (i < outlen)
+					filterDF = filterDF.withColumnRenamed(colName, newValue.get(i++).toString());
+				else
+					break; // Not enough so break it
+			}
+			return filterDF;
+		
+		}
+		
+		else {
 			logger.warning("This filter condition is not supported:" + condition);
 		}
 		return filterDF;

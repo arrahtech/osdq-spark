@@ -19,10 +19,15 @@ import scala.collection.mutable.WrappedArray;
  * 
  * /opt/mapr/spark/spark-1.6.1/bin/spark-submit -v --master yarn --jars /home/hmakam001c/ACESample/spark-csv_2.10-1.4.0.jar,/home/hmakam001c/ACESample/commons-csv-1.3.jar --class com.comcast.athena.ace.spark.run.ACESegmentTimeRunner /home/hmakam001c/ACE/ACESpark-0.0.1-SNAPSHOT-jar-with-dependencies.jar -c /home/hmakam001c/ACE/config_seg_time_int.json
  */
-public class UDFFile {
+public class UDFFile implements java.io.Serializable{
 
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-
+		public  String regex="", replacement="";
+	
 	public final static UDF1<WrappedArray<String>,String> hourPartArrayAvg =  new UDF1<WrappedArray<String>,String>() {
 
 		/**
@@ -99,6 +104,21 @@ public class UDFFile {
 		public String call(Object a) throws Exception {
 			if (a == null ) return "";
 			return a.toString().toUpperCase();
+		}
+		
+	};
+	
+	public final  UDF1<Object,String> regex_replace =  new UDF1<Object,String>() {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public String call(Object a) throws Exception {
+			if (a == null ) return "";
+			return a.toString().replaceAll(regex, replacement);
 		}
 		
 	};
@@ -197,10 +217,25 @@ public class UDFFile {
 			retDF = df.withColumn(conditions.getColumn(), org.apache.spark.sql.functions.callUDF(udfname,
 					JavaConversions.asScalaBuffer(grpcol).seq()));
 			return retDF;
+		} else if (udfname.equalsIgnoreCase("regex_replace")){
+			
+			UDFFile udffile = new UDFFile();
+			df.sqlContext().udf().register(udfname, udffile.regex_replace,dt);
+			
+			for( String s: colgrp) // it is of format col1
+				grpcol.add( new Column(s) );
+			
+			String aggrcond = conditions.getAggrcondition();
+			String[] aggrcondA = aggrcond.split(",");
+			udffile.regex = aggrcondA[0]; udffile.replacement = aggrcondA[1];
+			// Now call the UDF
+			retDF = df.withColumn(conditions.getColumn(), org.apache.spark.sql.functions.callUDF(udfname,
+					JavaConversions.asScalaBuffer(grpcol).seq()));
+			
+			return retDF;
 		} 
 		
-		
 		return df;
-		
+	
 	}
 }

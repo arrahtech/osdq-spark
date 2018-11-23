@@ -133,7 +133,10 @@ public class TransformWrapper {
 				String[] aggrCA = aggrCond.split(",");
 				Map<String,String> condMap = new HashMap<String,String>();
 				for (int i=0; i < aggrCA.length; i=i+2)
-					condMap.put(aggrCA[i], aggrCA[i+1]);
+					// TO match sql type sum(colname) change key value
+					//condMap.put(aggrCA[i], aggrCA[i+1]); 
+					condMap.put(aggrCA[i+1], aggrCA[i]); 
+				
 				
 				// aggre can be only min,max,sum,count,avg
 				//System.out.println(grpcol.toString());

@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "dropcolumn",
     "sql",
     "aggrcondition",
-    "funcname"
+    "funcname",
+    "onconflict"
 })
 public class ConditionParser implements Serializable
 {
@@ -51,6 +52,8 @@ public class ConditionParser implements Serializable
     private String aggrcondition;
     @JsonProperty("funcname")
     private String funcname;
+    @JsonProperty("onconflict")
+    private String onconflict;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private final static long serialVersionUID = 7944448796714875419L;
@@ -165,6 +168,17 @@ public class ConditionParser implements Serializable
         this.sql = sql;
     }
 
+    @JsonProperty("onconflict")
+    public String getOnconflict() {
+        return onconflict;
+    }
+
+    @JsonProperty("onconflict")
+    public void setOnconflict(String onconflict) {
+        this.onconflict = onconflict;
+    }
+
+    
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

@@ -2,6 +2,7 @@
 package org.arrah.framework.jsonparser;
 
 import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,7 +14,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "verbose",
     "noexecutor",
     "nocore",
-    "executormemory"
+    "executormemory",
+    "confparam"
 })
 public class SparkConfigParser implements Serializable
 {
@@ -35,6 +37,8 @@ public class SparkConfigParser implements Serializable
     private String nocore;
     @JsonProperty("executormemory")
     private String executormemory;
+    @JsonProperty("confparam")
+    private String confparam;
    
     @JsonProperty("appname")
     public String getAppName() {
@@ -90,6 +94,16 @@ public class SparkConfigParser implements Serializable
     @JsonProperty("verbose")
 	public String getVerbose() {
 		return verbose;
+	}
+    
+    @JsonProperty("confparam")
+	public void setConfparam(String confparam) {
+		this.confparam = confparam;
+	}
+    
+    @JsonProperty("confparam")
+	public String getConfparam() {
+		return confparam;
 	}
 
    

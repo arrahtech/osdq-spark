@@ -1,5 +1,7 @@
 **Framework Readme**
+
 **Date 02-Nov-2018**
+
 **V.0.0.1**
 
 ## Why Framework is needed
@@ -16,7 +18,7 @@ Framework is JSON based data processing module which converts JSON into Apache S
 ### Architecture
 
 TBD
-![Architecture](jsonFrameworkArch2.svg)
+![Architecture](./jsonFrameworkArch2.svg)
 
 TBD
 ![Architecture](https://gitlab.com/arun-y/osdq-spark-framework/raw/master/jsonFrameworkArch3.svg)

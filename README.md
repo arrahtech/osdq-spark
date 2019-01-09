@@ -1,6 +1,27 @@
-** Framework Readme 
-** Date 02-Nov-2018
-** V.0.0.1
+**Framework Readme**
+**Date 02-Nov-2018**
+**V.0.0.1**
+
+## Why Framework is needed
+
+Framework is JSON based data processing module which converts JSON into Apache Spark code and runs on spark cluster.
+
+1. How it will help you ?
+2. You do not need spark developers to write data processing code
+3. It will enhance the development time
+4. Traditional SQL based data processing can be easily changed to JSON
+5. Data Processing and Data Storage can be combined
+6. Easy to wrap up code and run on cloud
+
+
+TBD Image#1
+
+
+TBD Image#2
+
+
+
+## Using Framework
 
 This json contains 4 major block - sparkconfig,datasources, transformations and outputs.
 

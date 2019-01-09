@@ -13,12 +13,12 @@ Framework is JSON based data processing module which converts JSON into Apache S
 5. Data Processing and Data Storage can be combined
 6. Easy to wrap up code and run on cloud
 
+### Architecture
 
-TBD Image#1
+![Architecture](jsonFrameworkArk2.jpg)
 
 
-TBD Image#2
-
+![Architecture](jsonFrameworkArk3.jpg)
 
 
 ## Using Framework

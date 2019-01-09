@@ -15,9 +15,10 @@ Framework is JSON based data processing module which converts JSON into Apache S
 
 ### Architecture
 
-![Architecture](https://gitlab.com/arun-y/osdq-spark-framework/raw/master/jsonFrameworkArch2.svg)
+TBD
+![Architecture](jsonFrameworkArch2.svg)
 
-
+TBD
 ![Architecture](https://gitlab.com/arun-y/osdq-spark-framework/raw/master/jsonFrameworkArch3.svg)
 
 

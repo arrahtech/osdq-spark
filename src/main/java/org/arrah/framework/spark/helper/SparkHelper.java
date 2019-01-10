@@ -43,7 +43,6 @@ public class SparkHelper {
 				dataFrame = sqlContext.read().format("com.databricks.spark.csv").option("header", localheader)
 						.option("inferSchema", "true").option("delimiter", format).load(inputPath);
 			}
-
 			return dataFrame;
 
 		} catch (Exception e) {
@@ -116,7 +115,7 @@ public class SparkHelper {
 	}
 	**/
 	
-	// To pass more infor
+	// To pass more information
 	public static Dataset<Row> getDataFrame(SparkSession sqlContext, DatasourceParser ds) {
 		if (ds == null)  {
 			logger.severe("Could not process DataFrame:");

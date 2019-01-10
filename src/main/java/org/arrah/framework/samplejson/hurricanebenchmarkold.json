@@ -49,7 +49,7 @@
       "conditions": [
         {
           "condition": "groupby",
-          "value": [ "liitm","lilocn","lilotn","limcu"],
+          "value": [ "cola","colb","colc","cold"],
           "aggrcondition": "di_sequence_number,max"
         }
       ]
@@ -76,7 +76,7 @@
       "conditions": [
         {
           "condition":"UDF",
-          "value": [ "liitm","lilocn"],
+          "value": [ "cola","colb"],
           "column": "testcolumnUDF",
           "datatype": "string"
         }
@@ -96,8 +96,8 @@
   ],
   "outputs": [
     {
-      "name": "STB-BASE_TABLE",
-      "location": "/mapr/ATHENA-AS-S/user/jsonFramework/dynamic/",
+      "name": "OUTPUT",
+      "location": "/vivek/user/jsonFramework/dynamic/",
       "sources": [
         "STB-PN-JOIN"
       ],

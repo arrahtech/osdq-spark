@@ -88,7 +88,6 @@ public class FilterDF {
 			filterDF = df.where(newValue.get(0).toString());
 		
 		}  else if (condition.equalsIgnoreCase("COLNAMEFROMFILE")) {
-			
 			String[] colNames = df.columns();
 			filterDF = df;
 			int i=0;

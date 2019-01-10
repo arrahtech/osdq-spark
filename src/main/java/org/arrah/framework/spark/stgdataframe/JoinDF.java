@@ -47,7 +47,8 @@ public class JoinDF {
 			filterDF = joincolumnexpr( ldf,  rdf, c);
 		} catch (Exception e) {
 			logger.severe("Could not join. Error:" +  e.getLocalizedMessage());
-			return filterDF;
+			logger.severe("Returning left dataset:");
+			return ldf;
 		}
 		
 		return filterDF;

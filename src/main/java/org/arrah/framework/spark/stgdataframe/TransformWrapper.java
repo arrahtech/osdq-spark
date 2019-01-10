@@ -15,6 +15,7 @@ import org.apache.spark.sql.RelationalGroupedDataset;
 import org.apache.spark.sql.Row;
 import org.arrah.framework.jsonparser.ConditionParser;
 import org.arrah.framework.jsonparser.TransformationParser;
+import org.arrah.framework.spark.helper.UDFilter;
 
 import scala.collection.JavaConverters;
 
@@ -106,13 +107,26 @@ public class TransformWrapper {
 
 	}
 
-
-	
+	// we have to functionality so that it can take from file or inline json
 	private static Dataset<Row>  sqlDF(Dataset<Row>  dataFrame, List<ConditionParser> conditions,String tableName) {
 
-		dataFrame.createOrReplaceTempView(tableName);
 		
-		return dataFrame.sqlContext().sql(conditions.get(0).getSql());
+		Dataset<Row>  retDF = dataFrame;
+		
+		for (ConditionParser c : conditions)  {
+			retDF.createOrReplaceTempView(tableName);
+			String fileorinline= c.getCondition();
+			if (fileorinline == null || "".equals(fileorinline) || fileorinline.toLowerCase().startsWith("file") == false) 
+				retDF = retDF.sqlContext().sql(c.getSql());
+			else { // take sql from file
+				String filename= fileorinline.split(",")[1];
+				String sqlstr = UDFilter.filetoSQL(filename);
+				//System.out.println("SQL:" + sqlstr);
+				retDF = retDF.sqlContext().sql(sqlstr);
+			}
+		}
+		
+		return retDF;
 		
 	}
 	

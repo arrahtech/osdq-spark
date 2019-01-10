@@ -90,6 +90,7 @@ public class UDFilter {
         }
     };
     
+    // at this point of time no comment string
     private static List<? extends Object> parseFile(String fileName) {
     	List<String> selectexpr = new ArrayList<String>();
     		try {
@@ -98,10 +99,13 @@ public class UDFilter {
     			List<String> lines = Files.readAllLines(path,StandardCharsets.ISO_8859_1);
     			String multiline="";
     			for (String line: lines) {
+    				if (line == null || "".equals(line ) || line.length() <= 1) continue;
     				line = line.trim();
-    				char c = line.charAt(line.length() -1); // last character
+    				if (line.length() <= 1) continue;
+    				char c = line.charAt(line.length() -1); // last character if not empty
     				if (c == ',') {
     					line =line.substring(0, line.length() -1);
+    					line = line.trim();
     					if ("".equals(multiline) )
     						selectexpr.add(line);
     					else
@@ -109,7 +113,9 @@ public class UDFilter {
     					multiline="";
     				}
     				else if (c =='\\') {
-    					multiline += line.substring(0, line.length() -1)+" ";
+    					multiline += line.substring(0, line.length() -1).trim()+" ";
+    				} else {
+    					logger.severe("Line not closed properly:" + line);
     				}
     				
     			}
@@ -120,9 +126,32 @@ public class UDFilter {
     			return selectexpr;
     			
     		} catch (Exception e) {
-    			logger.severe(e.getLocalizedMessage());
+    			logger.severe("File:" + fileName + ":"+e.getLocalizedMessage());
     			return selectexpr;
     		}
     	
     }
-}
+    
+    // try to read a sql file with comments
+    public static String filetoSQL(String fileName) {
+    	String sqlline="";
+    		try {
+    			File keyfile = new File(fileName);
+    			Path path = Paths.get(keyfile.getPath());
+    			List<String> lines = Files.readAllLines(path,StandardCharsets.ISO_8859_1);
+    			for (String line: lines) {
+    				if (line == null || "".equals(line ) || line.length() <= 1) continue;
+    				line = line.trim();
+    				if (line.startsWith("//") || line.startsWith("--")) continue; // comment
+    				sqlline = sqlline+" "+line;
+    				sqlline.trim();
+    			}
+    			
+    		} catch (Exception e) {
+    			logger.severe("File:" + fileName + ":"+e.getLocalizedMessage());
+    		}
+    		
+    		return sqlline;
+    }
+    
+} // end of file

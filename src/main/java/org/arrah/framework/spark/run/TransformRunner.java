@@ -3,6 +3,7 @@ package org.arrah.framework.spark.run;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,8 @@ public class TransformRunner implements Serializable {
 				List<DatasourceParser> datasources = jsonConfig.getDatasources();
 	
 				for (DatasourceParser ds : datasources) {
-					// logger.severe(ds.getName());
+					if (isVerbose == true) 
+						System.out.println("loading Dataset:"+ds.getName());
 					dataFramesMap.put(ds.getName(), new DatasourceDF(ds).getDataFrame(spark));
 				}
 			} catch (Exception e) {
@@ -158,10 +160,20 @@ public class TransformRunner implements Serializable {
 						else
 							transformsMap.put(prp, t);
 					}
+					
 					noOfTransforms = transforms.size(); // start again after reducing for default values
 					for (int i = 1; i <= noOfTransforms; i++) {
 						TransformationParser t = transformsMap.get(i);
-						dataFramesMap.put(t.getName(), TransformWrapper.applyTransform(t, dataFramesMap));
+						try {
+							if (isVerbose == true) 
+								System.out.println("Applying transformation to :" + t.getName() + " at Priority:" + i);
+							dataFramesMap.put(t.getName(), TransformWrapper.applyTransform(t, dataFramesMap));
+						} catch (Exception e) {
+							System.err.println("Transforamtion exception" + e.getLocalizedMessage());
+							logger.severe("Not able to apply Transform for dataset:" + t.getName());
+							System.out.println("Columns:" + Arrays.asList(dataFramesMap.get(t.getSource()).columns()) );
+							continue;
+						}
 					}
 		
 					if (isVerbose == true) {
@@ -173,7 +185,7 @@ public class TransformRunner implements Serializable {
 						}
 					}
 				}
-			}
+			} // if null then move to Output directly
 			
 			List<OutputParser> outputs = jsonConfig.getOutputs();
 			for (OutputParser o : outputs) {

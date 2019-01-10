@@ -17,10 +17,9 @@ Framework is JSON based data processing module which converts JSON into Apache S
 
 ### Architecture
 
-TBD
 ![jsonFrameworkArch2](/uploads/06ecbaa44cd2a5828758ff72f53a975f/jsonFrameworkArch2.png)
 
-TBD
+
 ![jsonFrameworkArch3](/uploads/e484466cd2977c63b350e313305a58db/jsonFrameworkArch3.png)
 
 

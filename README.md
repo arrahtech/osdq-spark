@@ -360,165 +360,558 @@ Following json snipped with save dataframe "UDFData-Filter-newCol" at location â
 Examples: complete json
 
 ```json
+
+
+
+
+Conversation opened. 1 read message.
+
+
+
+
+
+
+
+Skip to content
+Using Gmail with screen readers
+
+
+Search
+
+
+
+
+
+
+
+
+
+
+Compose
+Labels
+
+Inbox
+31,777
+
+
+Starred
+
+
+Snoozed
+
+
+Important
+
+
+Sent
+
+
+Drafts
+162
+
+
+
+Categories
+
+
+
+[Imap]/Sent
+
+
+
+[Imap]/Trash
+13
+
+
+
+ApacheDrill
+1,501
+
+
+
+ApacheStrom
+1
+
+
+
+DeensAcademy
+519
+
+
+
+Deleted Messages
+
+
+
+G-Eleven
+179
+
+
+
+MyDlinkCamera
+247
+
+
+
+OrientDB
+
+
+
+SmartWork
+1,214
+
+
+
+Upcoming Travel
+
+
+
+Xolo Call History
+
+
+
+Xolo SMS
+
+More
+ 
+
+Hangouts
+
+
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+More
+14 of 43,428
+
+
+
+
+
+
+ 
+ 
+updated document for SQL to JSON
+
+
+Inbox
+x
+
+
+
+
+Vivek singh 
+
+11:58 AM (9 hours ago)
+
+
+
+to me 
+
+
+
+
+
+
+Hi Arun,
+Please find the updated document attached. 
+PPT tells you how to move a SQL to JSON and .json is final outcome. Keep it ready in Github. Once I send the final code we can put on github and make it open source under GPL 3.0 ( like all others in osdq-spark repository)
+
+
+2 Attachments
+
+ 
+
+
+ 
+
+
+
+
+Thanks, I'll take a look.Sure, will do that.It is not available.
+Reply
+Forward
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
   "sparkconfig": 
     {
       "appname": "TransformRunner",
-      "master":"local[3]",
-      "verbose":"true",
+      "master":"local[8]",
+      "verbose":"false",
       "noexecutor":"3",
       "nocore":"3",
-      "executormemory":"3G"
+      "executormemory":"3G",
+      "confparam":"spark.speculation,false,spark.hadoop.mapreduce.map.speculative,false,spark.hadoop.mapreduce.reduce.speculative,false"
     },
   "datasources": [
     {
-      "name": "SampleData",
-  "location":"/Users/vsingh007c/modified.csv",
+      "name": "mat",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/Material/material.csv",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "PPV",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/PVC_OUTPUT/AP-5160.csv",
       "locationType": "static",
       "format": "csv",
-      "selectedColumns": []
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "PO",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/PO_VS_SSE_RECONCILE/po_vs_sse.txt",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "SSE",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/SSE/sse.txt",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "ITCST",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/stdcost/stdcost.dat",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "VD",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/VENDOR/vendor.txt",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
+    },
+    {
+      "name": "PO_SOURCING",
+      "location":"/Users/vsingh007c/Downloads/datasample/spark_sample_data_1st_insert/PO/po.txt",
+      "locationType": "static",
+      "format": "|",
+      "selectedColumns": [],
+      "header":"false"
     }
   ],
   "transformations": [
+    
     {
-      "name": "SampleData",
-      "type": "sampling",
-      "source": "SampleData",
+    "name": "mat",
+      "type": "filter",
+      "source": "mat",
       "priority": 1,
       "cache": false,
       "conditions": [
         {
-          "condition": "random",
-          "value": ["0.20"]
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","PPV_ReconcileMaterial.txt"],
+          "datatype": "String"
         }
       ]
     },
     {
-      "name": "SampleData",
-      "type": "transformation",
-      "source": "SampleData",
+    "name": "PPV",
+      "type": "filter",
+      "source": "PPV",
       "priority": 2,
       "cache": false,
       "conditions": [
         {
-          "condition":"UDF",
-          "funcname":"concat",
-          "value": [ "col1","col2"],
-          "column": "testcolumnUDF",
-          "datatype": "string"
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","PVC_OUTPUT.txt"],
+          "datatype": "String"
         },
         {
-          "condition":"UDF",
-          "funcname":"tolower",
-          "value": ["testcolumnUDF"],
-          "column": "LowertestcolumnUDF",
-          "datatype": "string"
-        },
-        {
-          "condition":"UDF",
-          "funcname":"tolong",
-          "value": ["LowertestcolumnUDF"],
-          "column": "longLowertestcolumnUDF",
-          "datatype": "Long"
-        },
-        {
-          "condition":"normalise",
-          "funcname":"zeroscore",
-          "value": ["col10"],
-          "column": "normcol10",
-          "datatype": "Long"
+          "condition": "expression",
+          "value": ["constant","SUBSTRING(cast(period as string),1,4) >= '2015' "],
+          "datatype": "Integer"
         }
+        
       ]
     },
     {
-      "name": "SampleData-Filter",
+    "name": "PO",
       "type": "filter",
-      "source": "SampleData",
+      "source": "PO",
       "priority": 3,
       "cache": false,
       "conditions": [
         {
-          "column": "col10",
-          "condition": "GREATER",
-          "value": ["variable","datenow","yyyy"],
-          "datatype": "Long"
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","PO_VS_SSE_RECONCILE.txt"],
+          "datatype": "String"
         }
       ]
     },
     {
-      "name": "SampleData",
-      "type": "enrichment",
-      "source": "SampleData",
+      "name": "PO",
+      "type": "aggregate",
+      "source": "PO",
       "priority": 4,
       "cache": false,
       "conditions": [
         {
-          "condition": "addcolumns",
-          "aggrcondition": "testcolumn1:trim(col10):substrcol1:substr(now(),1,4):newcolumn:concat(testcolumn1,col4)"
+          "condition": "groupby",
+          "value": ["region","PO_PLANT","po_number","po_material_number"],
+          "aggrcondition": "min,sse_price,min,sse_currency,max,BPVOLUME,MAX,SOURCING_TYPE"
         }
       ]
     },
     {
-      "name": "SampleData",
-      "type": "enrichment",
-      "source": "SampleData",
-      "priority": 8,
-      "cache": false,
-      "conditions": [
-        {
-          "condition": "renamecolumns",
-          "aggrcondition": "testcolumn1,rename1,substrcol1,rename2,newcolumn,rename3"
-        }
-      ]
-    },
-    {
-      "name": "SampleData",
+      "name": "PPV",
       "type": "join",
-      "source": "SampleData,SampleData",
+      "source": "PPV,mat",
       "priority": 5,
       "cache": false,
       "conditions": [
         {
-          "joinType": "Unionall"
+          "joinType": "inner",
+          "leftcolumn": "plant,material",
+          "condition": "equal",
+          "rightcolumn": "env,MATNR",
+          "dropcolumn": "",
+          "onconflict":"PPV_,mat_"
         }
       ]
     },
     {
-      "name": "Groupdata",
-      "type": "aggregate",
-      "source": "StratifiedData",
-      "priority": 7,
-      "cache": false,
-      "conditions": [
-        {
-          "condition": "groupby",
-          "value": [ "col2"],
-          "aggrcondition": "col2,count"
-        }
-      ]
-    },
-    {
-      "name": "StratifiedData",
-      "type": "sampling",
-      "source": "SampleData",
+      "name": "PPV",
+      "type": "enrichment",
+      "source": "PPV",
       "priority": 6,
       "cache": false,
       "conditions": [
         {
-          "condition": "stratified",
-          "value": ["0.002","I","0.8"],
-          "column": "col2"
+          "condition": "addcolumns",
+          "aggrcondition": "plantcode:substring(plant, 1, 2)"
+        }
+      ]
+    },
+    {
+      "name": "PO",
+      "type": "enrichment",
+      "source": "PO",
+      "priority": 7,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "addcolumns",
+          "aggrcondition": "plantcode:substring(region, 1, 2)"
+        }
+      ]
+    },
+    {
+      "name": "PPV",
+      "type": "join",
+      "source": "PPV,PO",
+      "priority": 8,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "plantcode,plant,material,ponumber",
+          "condition": "equal",
+          "rightcolumn": "plantcode,PO_PLANT,po_material_number,po_number",
+          "dropcolumn": "",
+          "onconflict":"PPV_,PO_"
+        }
+      ]
+    },
+    {
+    "name": "SSE",
+    "type": "filter",
+    "source": "SSE",
+    "priority": 9,
+    "cache": false,
+    "conditions": [
+        {
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","sseheader.txt"],
+          "datatype": "String"
+        }
+    ]
+    },
+    {
+      "name": "SSE",
+      "type": "query",
+      "source": "SSE",
+      "priority": 10,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "file,ssegroupbysql.txt",
+          "sql": ""
+        }
+      ]
+    },
+    {
+    "name": "ITCST",
+      "type": "filter",
+      "source": "ITCST",
+      "priority": 11,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","STDCOST.txt"]
+        },
+        {
+          "condition": "expression",
+          "value": ["constant","MATERIAL_COST > 0 "]
+        }
+      ]
+    },
+    {
+      "name": "PPV",
+      "type": "join",
+      "source": "PPV,ITCST",
+      "priority": 12,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "plant,material,period",
+          "condition": "equal",
+          "rightcolumn": "ITCST_env,MATNR,YEAR",
+          "dropcolumn": "",
+          "onconflict":"PPV_,ITCST_"
+        }
+      ]
+    },
+    {
+      "name": "PPV",
+      "type": "join",
+      "source": "PPV,SSE",
+      "priority": 13,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "plant,material",
+          "condition": "equal",
+          "rightcolumn": "SOURCEPLANT,SOURCEMATERIALID",
+          "dropcolumn": "",
+          "onconflict":"PPV_,SSE_"
+        }
+      ]
+    },
+    {
+    "name": "VD",
+      "type": "filter",
+      "source": "VD",
+      "priority": 14,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","vendors.txt"]
+        }
+      ]
+    },
+    {
+      "name": "PPV",
+      "type": "join",
+      "source": "PPV,VD",
+      "priority": 15,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "po_vendornumber,PPV_SOURCE_ID",
+          "condition": "equal",
+          "rightcolumn": "LIFNR,SOURCE_ID",
+          "dropcolumn": "",
+          "onconflict":"PPV_,VD_"
+        }
+      ]
+    },
+    {
+    "name": "PO_SOURCING",
+      "type": "filter",
+      "source": "PO_SOURCING",
+      "priority": 16,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "COLNAMEFROMFILE",
+          "value": ["file","PO.txt"]
+        }
+      ]
+    },
+    {
+      "name": "PO_SOURCING",
+      "type": "query",
+      "source": "PO_SOURCING",
+      "priority": 17,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "file,selectsqlpo.txt",
+          "sql": ""
+        }
+      ]
+    },
+    {
+    "name": "PPV_output",
+      "type": "filter",
+      "source": "PPV",
+      "priority": 18,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "selectexpr",
+          "value": ["file","selectexprfile_ppvreconcile.txt"],
+          "datatype": "String"
         }
       ]
     }
   ],
   "outputs": [
     {
-      "name": "BASE_TABLE",
+      "name": "PPV",
       "location": "/Users/vsingh007c/Downloads/",
-      "sources": ["UDFData-Filter-newCol"],
+      "sources": ["PPV"],
       "format": "parquet",
-      "savemode": "append",// append or overwrite
+      "savemode": "overwrite",
       "selectedColumns": []
     }
   ]

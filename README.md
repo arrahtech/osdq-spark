@@ -26,7 +26,240 @@ TBD
 
 ## Using Framework
 
-This json contains 4 major block - sparkconfig,datasources, transformations and outputs.
+
+### how to convert SQL to JSON using osDQ-Spark
+
+- Add datasource for each original tables. Derived tables can be build during data processing phase
+- Whichever columns you need you can put in selectedColumns -  [] means all or it can be comma separated
+- Joins and Filters can be added in JSON transformation
+- Derivative columns are not supported in join conditions to first add columns with derivatives then join
+- selectExpr block can be from File. Similarly column header can be taken from file. This files can be multiline. It has a predefined format
+
+
+> FROM (select * from lpfg_core.tablename WHERE FCUR <> 'EUR'  )tablename    
+
+### Equivalent JSON
+
+```json
+"datasources": [
+    {
+      "name": "tablename",
+      "location":"/Users/vsingh007c/Downloads/drive-download-20180718T060717Z-001/cdc/tablename.csv",
+      "locationType": "static",
+      "format": "csv",
+      "selectedColumns": []
+    }
+
+OR (if it is database)
+    {
+      "name": "tablename",
+      "format": "jdbc", "jdbcparam":"url,jdbc:mysql://localhost:3306/mysql,driver,com.mysql.jdbc.Driver,user,root,password,root,dbtable,(select * from lpfg_core.tablename WHERE FCUR <> 'EUR') AS T,partitionColumn,parent_category_id,lowerBound,0,upperBound,10000,numPartitions,10",
+      "selectedColumns": []
+    }
+
+  ]
+  ```
+  
+  
+> LEFT OUTER JOIN lpfg_wrk.vendors  vendor   on (regexp_replace(trim(tablename.VENDOR_no),"^0*","")=regexp_replace(trim(vendor.lifnr),"^0*","") and tablename.source_id=vendor.source_id ) 
+
+### Equivalent JSON
+
+```json
+"transformations": [
+    {
+      "name": "vendor",
+      "type": "enrichment",
+      "source": "vendor",
+      "priority": 1,
+      "cache": false,
+      "conditions": [
+      {
+          "condition": "renameallcolumns",
+          "aggrcondition": ”vendor_"
+        },
+        {
+          "condition": ”replacecolumns",
+          "aggrcondition": "vendors_ lifnr :regexp_replace(trim(vendor_lifnr),\"^0*\",\”\")"
+        }
+      ]
+    },
+
+    {
+      "name": ”tablename",
+      "type": "enrichment",
+      "source": ”tablename",
+      "priority": 2,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "renameallcolumns",
+          "aggrcondition": ”tablename_"
+        },
+        {
+          "condition": ”replacecolumns",
+          "aggrcondition": " tablename_VENDOR_no :regexp_replace(trim(tablename_VENDOR_no),\"^0*\",\”\")
+        }
+      ]
+    }
+    
+    ```
+    
+> New SQL -- LEFT OUTER JOIN lpfg_wrk.vendors vendor on tablename_VENDOR_no=vendor_lifnr and tablename_source_id=vendor_source_id ) 
+
+### Equivalent JSON
+ 
+```json
+{
+      "name": ”tablename",
+      "type": "join",
+      "source": ”tablename,vendor",
+      "priority": 3,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "tablename_VENDOR_no, tablename_source_id ",
+          "condition": "equal",
+          "rightcolumn": "vendor_lifnr,vendor_source_id",
+          "dropcolumn": ""
+        }
+      ]
+    }
+```
+
+__Now do a left outer join and update tablename to have those joined columns. Do not drop any columns. Nth column is matched with nth column__
+
+
+> LEFT OUTER JOIN lpfg_stg.EXCHANGE_RATES  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND TRIM(ER_ACT.CURRENCY_TO) = 'EUR’ AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE AND TRIM(ER_ACT.EXRT_TYPE) = 'M')
+
+### Equivalent JSON
+
+```json
+{
+      "name": "ER_ACT",
+      "type": "filter",
+      "source": "EXCHANGE_RATES",
+      "priority": 4,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "Expression",
+          "value": ["constant",”TRIM(ER_ACT.CURRENCY_TO) = 'EUR’ AND TRIM(ER_ACT.EXRT_TYPE) = 'M')"],
+          "datatype": "String"
+        }
+}
+```
+__It has combinations of filter conditions and join conditions. So first take filter condition then join__
+
+> New SQL -- LEFT OUTER JOIN  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE
+
+### Equivalent JSON
+
+```json
+{
+      "name": ”tablename",
+      "type": "join",
+      "source": ”tablename,ER_ACT",
+      "priority": 5,
+      "cache": false,
+      "conditions": [
+        {
+          "joinType": "left_outer",
+          "leftcolumn": "tablename_FCUR,tablename_FROM_DATE ",
+          "condition": "equal",
+          "rightcolumn": "ER_ACT_CURRENCY_FROM,ER_ACT_VALID_FROM_DATE",
+          "dropcolumn": ""
+        }
+      ]
+    }
+```
+
+> select distinct INVOICECOUNT , tablename.SOURCE_ID ,tablename.SOURCE_REGION ,POSTING_YEAR .... cast(tablename.CONVERSION_FACTOR as double),'EUR’,  …….
+
+###Equivalent JSON
+
+```json
+{
+      "name": ”tablename-simple",
+      "type": "filter",
+      "source": ”tablename",
+      "priority": 3,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "DROPDUPLICATES",
+          "value": ["constant",”tablename_INVOICECOUNTtablename"],
+          "datatype": "String"
+        },
+        {
+          "condition": "selectexpr",
+          "value": ["constant” “tablename_INVOICECOUNT” , “tablename_SOURCE_ID” “tablename_SOURCE_REGION”,”POSTING_YEAR”, cast(tablename.CONVERSION_FACTOR as double),'EUR’,],
+          "datatype": "String"
+        }
+      ]
+    }
+```
+
+- One of easiest and quickest way is take the select block and put into selectExpr block. However it might have 
+- Performance issues as it may need many shuffling inside one dataframe.
+- Also if select block has non standard functions ( ANSI SQL)  or UDFs it will not work.  Those columns should be treated separately.
+- Other option is take additive select columns together and conditional columns ( case, if etc) together
+
+
+> case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
+>	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
+>		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
+> {
+>      "name": ”tablename",
+>      "type": "enrichment",
+>      "source": ”tablename",
+>      "priority": 6,
+>      "cache": false,
+>      "conditions": [
+>        {
+>          "condition": "addcolumns",
+>          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp_conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
+>(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END “
+>        }
+>Or can write you own condition using format
+>       ]
+>    }
+
+
+> case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
+>	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
+>		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
+
+###Equivalent JSON
+
+... Or can write you own condition using  format ( Proprietary)
+
+```json
+        {
+          "condition": "conditionalcolumn",
+          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : IF (STOCKING_UOM <> PURCHASING_UOM) THEN ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) ELSEIF (STOCKING_UOM = PURCHASING_UOM ) THEN (RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) OTHERWISE RECEIPT_QUANTITY "
+        },
+--- now() as run_date,   System functions
+        {
+          "condition": "addcolumns",
+          "aggrcondition": " run_date :now()"
+        }
+       ]
+    }
+```
+
+#### Things to add
+ - Add trim while loading ( optional )
+ - Append dataframe name while loading  (optional)
+ - Select block from file with necessary filtering
+ - Enhance proprietary IF statements  (AND, OR , is Null , IsNot null, contain,regex )
+ - Use derived columns on the fly for Join condition
+
+
+### 
+
+This json contains 4 major block - sparkconfig, datasources, transformations and outputs.
 
 sparkconfig is optional and it takes the spark parameter. If this block is not there it will take parameter from spark-submit.
 
@@ -42,9 +275,6 @@ sparkconfig is optional and it takes the spark parameter. If this block is not t
 	"confparam":"spark.speculation,false,spark.hadoop.mapreduce.map.speculative,false,spark.hadoop.mapreduce.reduce.speculative,false"
     }
 ```
-
-
-
  datasources is must and and an array which takes input files or folder to load as dataframe. At present parquet,csv and text format are support. Multiple input files are loaded.
 
 ```json
@@ -360,209 +590,6 @@ Following json snipped with save dataframe "UDFData-Filter-newCol" at location �
 Examples: complete json
 
 ```json
-
-
-
-
-Conversation opened. 1 read message.
-
-
-
-
-
-
-
-Skip to content
-Using Gmail with screen readers
-
-
-Search
-
-
-
-
-
-
-
-
-
-
-Compose
-Labels
-
-Inbox
-31,777
-
-
-Starred
-
-
-Snoozed
-
-
-Important
-
-
-Sent
-
-
-Drafts
-162
-
-
-
-Categories
-
-
-
-[Imap]/Sent
-
-
-
-[Imap]/Trash
-13
-
-
-
-ApacheDrill
-1,501
-
-
-
-ApacheStrom
-1
-
-
-
-DeensAcademy
-519
-
-
-
-Deleted Messages
-
-
-
-G-Eleven
-179
-
-
-
-MyDlinkCamera
-247
-
-
-
-OrientDB
-
-
-
-SmartWork
-1,214
-
-
-
-Upcoming Travel
-
-
-
-Xolo Call History
-
-
-
-Xolo SMS
-
-More
- 
-
-Hangouts
-
-
- 
- 
- 
-
-
-
-
-
-
-
-
-More
-14 of 43,428
-
-
-
-
-
-
- 
- 
-updated document for SQL to JSON
-
-
-Inbox
-x
-
-
-
-
-Vivek singh 
-
-11:58 AM (9 hours ago)
-
-
-
-to me 
-
-
-
-
-
-
-Hi Arun,
-Please find the updated document attached. 
-PPT tells you how to move a SQL to JSON and .json is final outcome. Keep it ready in Github. Once I send the final code we can put on github and make it open source under GPL 3.0 ( like all others in osdq-spark repository)
-
-
-2 Attachments
-
- 
-
-
- 
-
-
-
-
-Thanks, I'll take a look.Sure, will do that.It is not available.
-Reply
-Forward
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {
   "sparkconfig": 
     {

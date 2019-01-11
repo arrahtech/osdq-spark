@@ -38,7 +38,7 @@ Framework is JSON based data processing module which converts JSON into Apache S
 
 > FROM (select * from lpfg_core.tablename WHERE FCUR <> 'EUR'  )tablename    
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 "datasources": [
@@ -63,7 +63,7 @@ OR (if it is database)
   
 > LEFT OUTER JOIN lpfg_wrk.vendors  vendor   on (regexp_replace(trim(tablename.VENDOR_no),"^0*","")=regexp_replace(trim(vendor.lifnr),"^0*","") and tablename.source_id=vendor.source_id ) 
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 "transformations": [
@@ -107,7 +107,7 @@ OR (if it is database)
     
 > New SQL -- LEFT OUTER JOIN lpfg_wrk.vendors vendor on tablename_VENDOR_no=vendor_lifnr and tablename_source_id=vendor_source_id ) 
 
-### Equivalent JSON
+__Equivalent JSON__
  
 ```json
 {
@@ -133,7 +133,7 @@ __Now do a left outer join and update tablename to have those joined columns. Do
 
 > LEFT OUTER JOIN lpfg_stg.EXCHANGE_RATES  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND TRIM(ER_ACT.CURRENCY_TO) = 'EUR’ AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE AND TRIM(ER_ACT.EXRT_TYPE) = 'M')
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -154,7 +154,7 @@ __It has combinations of filter conditions and join conditions. So first take fi
 
 > New SQL -- LEFT OUTER JOIN  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -177,7 +177,7 @@ __It has combinations of filter conditions and join conditions. So first take fi
 
 > select distinct INVOICECOUNT , tablename.SOURCE_ID ,tablename.SOURCE_REGION ,POSTING_YEAR .... cast(tablename.CONVERSION_FACTOR as double),'EUR’,  …….
 
-###Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -211,7 +211,7 @@ __It has combinations of filter conditions and join conditions. So first take fi
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
 >		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
 
-###Equivalent JSON
+__Equivalent JSON__
 
 ```json 
 {
@@ -235,7 +235,7 @@ Or can write you own condition using format
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
 >		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
 
-###Equivalent JSON
+__Equivalent JSON__
 
 ... Or can write you own condition using  format ( Proprietary)
 

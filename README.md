@@ -4,24 +4,24 @@
 
 **V.0.0.1**
 
-## Why Framework is needed
+**Contact us SUPPORT@ARRAHTECH.COM**
 
 Framework is JSON based data processing module which converts JSON into Apache Spark code and runs on spark cluster.
 
-1. How it will help you ?
-2. You do not need spark developers to write data processing code
-3. It will enhance the development time
-4. Traditional SQL based data processing can be easily changed to JSON
-5. Data Processing and Data Storage can be combined
-6. Easy to wrap up code and run on cloud
+### How it will help you ?
+
+1. You do not need spark developers to write data processing code
+2. It will enhance the development time
+3. Traditional SQL based data processing can be easily changed to JSON
+4. Data Processing and Data Storage can be combined
+5. Easy to wrap up code and run on cloud
 
 ### Architecture
 
-TBD
-![Architecture](./jsonFrameworkArch2.svg)
+![jsonFrameworkArch2](/uploads/06ecbaa44cd2a5828758ff72f53a975f/jsonFrameworkArch2.png)
 
-TBD
-![Architecture](https://gitlab.com/arun-y/osdq-spark-framework/raw/master/jsonFrameworkArch3.svg)
+
+![jsonFrameworkArch3](/uploads/e484466cd2977c63b350e313305a58db/jsonFrameworkArch3.png)
 
 
 ## Using Framework
@@ -38,7 +38,7 @@ TBD
 
 > FROM (select * from lpfg_core.tablename WHERE FCUR <> 'EUR'  )tablename    
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 "datasources": [
@@ -63,7 +63,7 @@ OR (if it is database)
   
 > LEFT OUTER JOIN lpfg_wrk.vendors  vendor   on (regexp_replace(trim(tablename.VENDOR_no),"^0*","")=regexp_replace(trim(vendor.lifnr),"^0*","") and tablename.source_id=vendor.source_id ) 
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 "transformations": [
@@ -107,7 +107,7 @@ OR (if it is database)
     
 > New SQL -- LEFT OUTER JOIN lpfg_wrk.vendors vendor on tablename_VENDOR_no=vendor_lifnr and tablename_source_id=vendor_source_id ) 
 
-### Equivalent JSON
+__Equivalent JSON__
  
 ```json
 {
@@ -133,7 +133,7 @@ __Now do a left outer join and update tablename to have those joined columns. Do
 
 > LEFT OUTER JOIN lpfg_stg.EXCHANGE_RATES  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND TRIM(ER_ACT.CURRENCY_TO) = 'EUR’ AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE AND TRIM(ER_ACT.EXRT_TYPE) = 'M')
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -154,7 +154,7 @@ __It has combinations of filter conditions and join conditions. So first take fi
 
 > New SQL -- LEFT OUTER JOIN  ER_ACT ON (TRIM(ER_ACT.CURRENCY_FROM) = TRIM(FCUR) AND ER_ACT.VALID_FROM_DATE = tablename.FROM_DATE
 
-### Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -177,7 +177,7 @@ __It has combinations of filter conditions and join conditions. So first take fi
 
 > select distinct INVOICECOUNT , tablename.SOURCE_ID ,tablename.SOURCE_REGION ,POSTING_YEAR .... cast(tablename.CONVERSION_FACTOR as double),'EUR’,  …….
 
-###Equivalent JSON
+__Equivalent JSON__
 
 ```json
 {
@@ -210,42 +210,46 @@ __It has combinations of filter conditions and join conditions. So first take fi
 > case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
 >		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
-> {
->      "name": ”tablename",
->      "type": "enrichment",
->      "source": ”tablename",
->      "priority": 6,
->      "cache": false,
->      "conditions": [
->        {
->          "condition": "addcolumns",
->          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp_conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
->(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END “
->        }
->Or can write you own condition using format
->       ]
->    }
 
+__Equivalent JSON__
+
+```json 
+{
+      "name": ”tablename",
+      "type": "enrichment",
+      "source": ”tablename",
+      "priority": 6,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "addcolumns",
+          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp_conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
+(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END “
+        }
+Or can write you own condition using format
+       ]
+    }
+```
 
 > case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
 >		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
 
-###Equivalent JSON
+__Equivalent JSON__
 
 ... Or can write you own condition using  format ( Proprietary)
 
 ```json
-        {
-          "condition": "conditionalcolumn",
-          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : IF (STOCKING_UOM <> PURCHASING_UOM) THEN ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) ELSEIF (STOCKING_UOM = PURCHASING_UOM ) THEN (RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) OTHERWISE RECEIPT_QUANTITY "
-        },
+    {
+      "condition": "conditionalcolumn",
+      "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : IF (STOCKING_UOM <> PURCHASING_UOM) THEN ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) ELSEIF (STOCKING_UOM = PURCHASING_UOM ) THEN (RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) OTHERWISE RECEIPT_QUANTITY "
+    },
 --- now() as run_date,   System functions
-        {
-          "condition": "addcolumns",
-          "aggrcondition": " run_date :now()"
-        }
-       ]
+    {
+      "condition": "addcolumns",
+      "aggrcondition": " run_date :now()"
+    }
+    ]
     }
 ```
 

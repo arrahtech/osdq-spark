@@ -4,16 +4,17 @@
 
 **V.0.0.1**
 
-## Why Framework is needed
+**Contact us SUPPORT@ARRAHTECH.COM**
 
 Framework is JSON based data processing module which converts JSON into Apache Spark code and runs on spark cluster.
 
-1. How it will help you ?
-2. You do not need spark developers to write data processing code
-3. It will enhance the development time
-4. Traditional SQL based data processing can be easily changed to JSON
-5. Data Processing and Data Storage can be combined
-6. Easy to wrap up code and run on cloud
+### How it will help you ?
+
+1. You do not need spark developers to write data processing code
+2. It will enhance the development time
+3. Traditional SQL based data processing can be easily changed to JSON
+4. Data Processing and Data Storage can be combined
+5. Easy to wrap up code and run on cloud
 
 ### Architecture
 
@@ -209,22 +210,26 @@ __It has combinations of filter conditions and join conditions. So first take fi
 > case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
 >		(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END as RECEIPT_QUANTITY_REPORTUOM, 
-> {
->      "name": ”tablename",
->      "type": "enrichment",
->      "source": ”tablename",
->      "priority": 6,
->      "cache": false,
->      "conditions": [
->        {
->          "condition": "addcolumns",
->          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp_conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
->(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END “
->        }
->Or can write you own condition using format
->       ]
->    }
 
+###Equivalent JSON
+
+```json 
+{
+      "name": ”tablename",
+      "type": "enrichment",
+      "source": ”tablename",
+      "priority": 6,
+      "cache": false,
+      "conditions": [
+        {
+          "condition": "addcolumns",
+          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp_conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
+(RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) else RECEIPT_QUANTITY END “
+        }
+Or can write you own condition using format
+       ]
+    }
+```
 
 > case when (STOCKING_UOM <> PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) then ((RECEIPT_QUANTITY/cast(tablename.CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double)))
 >	when ((STOCKING_UOM = PURCHASING_UOM  and purchase_uom_disp.conversion_factor is not null) AND PURCHASING_UOM <> purchase_uom_disp.uom_display and tablename.source_id=purchase_uom_disp.source_id) then 
@@ -235,16 +240,16 @@ __It has combinations of filter conditions and join conditions. So first take fi
 ... Or can write you own condition using  format ( Proprietary)
 
 ```json
-        {
-          "condition": "conditionalcolumn",
-          "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : IF (STOCKING_UOM <> PURCHASING_UOM) THEN ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) ELSEIF (STOCKING_UOM = PURCHASING_UOM ) THEN (RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) OTHERWISE RECEIPT_QUANTITY "
-        },
+    {
+      "condition": "conditionalcolumn",
+      "aggrcondition": "RECEIPT_QUANTITY_REPORTUOM : IF (STOCKING_UOM <> PURCHASING_UOM) THEN ((RECEIPT_QUANTITY/cast(tablename_CONVERSION_FACTOR as double))*(cast(purchase_uom_disp.conversion_factor as double))) ELSEIF (STOCKING_UOM = PURCHASING_UOM ) THEN (RECEIPT_QUANTITY*(cast(purchase_uom_disp.conversion_factor as double))) OTHERWISE RECEIPT_QUANTITY "
+    },
 --- now() as run_date,   System functions
-        {
-          "condition": "addcolumns",
-          "aggrcondition": " run_date :now()"
-        }
-       ]
+    {
+      "condition": "addcolumns",
+      "aggrcondition": " run_date :now()"
+    }
+    ]
     }
 ```
 

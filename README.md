@@ -9,7 +9,7 @@ __Contact us SUPPORT@ARRAHTECH.COM__
 OSDQ Spark is JSON based data processing framework which converts JSON into Apache Spark code and runs it on a spark cluster. This makes it easy for anyone to 
 utilize the power of ![Apache Spark](https://spark.apache.org/) withtout knowing much about Spark SQL. 
 
-* How it will help you ? *
+__How it will help you ?__
 
 1. You do not need spark developers to write data processing code
 2. It will enhance the development time

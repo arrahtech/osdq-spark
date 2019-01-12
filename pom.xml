@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.arrahtech</groupId>
-  <artifactId>spark-framework</artifactId>
+  <artifactId>osdq-spark</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>spark-framework</name>
+  <name>osdq-spark</name>
   <url>http://www.arrahtech.com</url>
 
   <properties>

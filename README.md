@@ -22,7 +22,7 @@ utilize the power of ![Apache Spark](https://spark.apache.org/) withtout knowing
 In order to get started we need to understand the JSON schema. They are simple to understand and easy to use.
 Please refer to [Understanding the JSON elements](/understanding-json-element) in our wiki for details.
 
-Once you understood the json elements, you can refer to our [wiki](/how-to-convert-sql-to-json) to write JSON for respective SQL 
+Once you understood the json elements, you can refer to [How to convert SQL to JSON](/how-to-convert-sql-to-json) to write JSON for respective SQL 
 
 
 ## Things to add

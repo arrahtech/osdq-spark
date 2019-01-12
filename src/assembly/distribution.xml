@@ -25,7 +25,6 @@
       <directory>src/main/resources</directory>
       <includes>
         <include>*.properties</include>
-        <include>MARA_fixed.csv</include>
       </includes>
       <outputDirectory>conf</outputDirectory>
     </fileSet>
@@ -35,7 +34,6 @@
       <includes>
         <include>README*</include>
         <include>model/**</include>
-        <include>MARA_fixed.csv</include>
       </includes>
     </fileSet>
   </fileSets>

@@ -1,4 +1,4 @@
-# OSDQ Spark
+# OSDQ Spark (beta)
 
 __Release Date: 14-Jan-2019__
 

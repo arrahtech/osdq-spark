@@ -94,7 +94,7 @@ We can also give a complete spark-submit script like
 
 
 
-Please refer to our [Wiki](/wikis) page for details.
+Please refer to our [Wiki](/osdq-spark/wiki) page for details.
 
 
 __USE CASES__

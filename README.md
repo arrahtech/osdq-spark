@@ -13,6 +13,7 @@ Logic can be written in JSON which can be given as input.
 
 It takes JSON file as input ( Look wiki pages for JSON format). A very simple example:
   
+```json  
     {
     "name": "MATERIAL",
       "type": "filter",
@@ -81,19 +82,23 @@ It takes JSON file as input ( Look wiki pages for JSON format). A very simple ex
         }
       ]
     }
-
+```
 
 __How To Run it__
 
-`TransformRunner -c "/Users/vsingh007c/Documents/workspace/sparkvalidation/src/org/arrah/framework/samplejson/hurricanebenchmark.json"
+> TransformRunner -c "/Users/vsingh007c/Documents/workspace/sparkvalidation/src/org/arrah/framework/samplejson/hurricanebenchmark.json"
 
 We can also give a complete spark-submit script like
-"spark-submit --class "org.arrah.framework.spark.run.TransformRunner" --master yarn --deploy-mode cluster --files "Example.json" TransformRunner.jar -c "Example.json"`
+
+> "spark-submit --class "org.arrah.framework.spark.run.TransformRunner" --master yarn --deploy-mode cluster --files "Example.json" TransformRunner.jar -c "Example.json"
+
+
 
 Please refer to our [Wiki](https://gitlab.com/arun-y/osdq-spark/wikis/) page for details.
 
 
 __USE CASES__
+
 1.  Convert Legacy SQL to Spark processing
 2.  Write new data processing pipeline
 3.  Add Data Quality as intermediate steps

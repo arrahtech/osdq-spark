@@ -86,7 +86,7 @@ It takes JSON file as input ( Look wiki pages for JSON format). A very simple ex
 
 __How To Run it__
 
->  java -jar osdq-spark_0.0.1.jar org.arrah.framework.spark.run. TransformRunner "/path/to/samplejson/hurricanebenchmark.json"
+> java -cp .\lib\*;.\osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner "/path/to/samplejson/hurricanebenchmark.json"
 
 We can also give a complete spark-submit script like
 

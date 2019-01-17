@@ -86,7 +86,15 @@ It takes JSON file as input ( Look wiki pages for JSON format). A very simple ex
 
 __How To Run it__
 
-> java -cp .\lib\*;.\osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner "/path/to/samplejson/hurricanebenchmark.json"
+###From the source
+
+> Get hold of source and run below command. Please note maven should be present in your system to build the application.
+
+> mvn package - This will create a build named "osdq-spark_0.0.1.zip" under target. Unzip the same, go inside the unzipped folder and run below command as given. 
+
+> java -cp .\lib\*;.\osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
+
+__Please note, we have given a `SampleDataJDBC` as sample data source for JDBC. If you do not have any JDBC data source to try out. You can remove the same from samplerun.json file. Even if you do not remove the samplerun.json will run successfully for file based datasource "modified.csv", though there will be few error message on standard output for `SampleDataJDBC`__
 
 We can also give a complete spark-submit script like
 

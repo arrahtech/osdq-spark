@@ -86,7 +86,7 @@ It takes JSON file as input ( Look wiki pages for JSON format). A very simple ex
 
 __How To Run it__
 
-###From the source
+### From the source
 
 > Get hold of source and run below command. Please note maven should be present in your system to build the application.
 

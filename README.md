@@ -105,7 +105,7 @@ __You can replace `SampleData` datasource with below to exploare JDBC database:_
     }
  ```
 
->> _For those on windows, you need to jave hadoop distribtion unzipped and HADOOP_HOME set. Also copy [winutils.exe](https://github.com/steveloughran/winutils/blob/master/hadoop-2.7.1/bin/winutils.exe) from here into HADOOP_HOME\bin_
+>> _For those on windows, you need to have hadoop distribtion unzipped on local drive and HADOOP_HOME set. Also copy [winutils.exe](https://github.com/steveloughran/winutils/blob/master/hadoop-2.7.1/bin/winutils.exe) from here into HADOOP_HOME\bin_
 
 
 We can also give a complete spark-submit script like

@@ -94,7 +94,16 @@ __How To Run it__
 
 > java -cp .\lib\*;.\osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
 
-__Please note, we have given a `SampleDataJDBC` as sample data source for JDBC. If you do not have any JDBC data source to try out. You can remove the same from samplerun.json file. Even if you do not remove the samplerun.json will run successfully for file based datasource "modified.csv", though there will be few error message on standard output for `SampleDataJDBC`__
+__You can replace `SampleData` datasource with below to exploare JDBC database:__
+
+```json
+    {
+      "name": "SampleDataJDBC",
+      "format": "jdbc",
+      "jdbcparam":"url,jdbc:mysql://localhost:3306/mysql,driver,com.mysql.jdbc.Driver,user,root,password,root,dbtable,(select * from help_category) AS T,partitionColumn,parent_category_id,lowerBound,0,upperBound,10000,numPartitions,10",
+      "selectedColumns": []
+    }
+ ```
 
 We can also give a complete spark-submit script like
 

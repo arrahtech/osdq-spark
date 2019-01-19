@@ -92,7 +92,7 @@ __How To Run it__
 
 > mvn package - This will create a build named "osdq-spark_0.0.1.zip" under target. Unzip the same, go inside the unzipped folder and run below command as given. 
 
-> java -cp .\lib\*;.\osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
+> java -cp .\lib\\*;osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
 
 __You can replace `SampleData` datasource with below to exploare JDBC database:__
 

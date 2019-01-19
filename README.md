@@ -105,6 +105,9 @@ __You can replace `SampleData` datasource with below to exploare JDBC database:_
     }
  ```
 
+>> _For those on windows, you need to jave hadoop distribtion unzipped and HADOOP_HOME set. Also copy [winutils.exe](https://github.com/steveloughran/winutils/blob/master/hadoop-2.7.1/bin/winutils.exe) from here into HADOOP_HOME\bin_
+
+
 We can also give a complete spark-submit script like
 
 > "spark-submit --class "org.arrah.framework.spark.run.TransformRunner" --master yarn --deploy-mode cluster --files "Example.json" TransformRunner.jar -c "Example.json"

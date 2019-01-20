@@ -88,10 +88,16 @@ __How To Run it__
 
 ### From the source
 
+_For those on windows, you need to have hadoop distribtion unzipped on local drive and HADOOP_HOME set. Also copy [winutils.exe](https://github.com/steveloughran/winutils/blob/master/hadoop-2.7.1/bin/winutils.exe) into HADOOP_HOME\bin_
+
 > Get hold of source and run below command. Please note maven should be present in your system to build the application.
 
 > mvn package - This will create a build named "osdq-spark_0.0.1.zip" under target. Unzip the same, go inside the unzipped folder and run below command as given. 
 
+[Unix/Mac]
+> java -cp .\lib\\*:osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
+
+[Windows]
 > java -cp .\lib\\*;osdq-spark-0.0.1.jar org.arrah.framework.spark.run.TransformRunner -c .\example\samplerun.json
 
 __You can replace `SampleData` datasource with below to exploare JDBC database:__
@@ -104,8 +110,6 @@ __You can replace `SampleData` datasource with below to exploare JDBC database:_
       "selectedColumns": []
     }
  ```
-
->> _For those on windows, you need to have hadoop distribtion unzipped on local drive and HADOOP_HOME set. Also copy [winutils.exe](https://github.com/steveloughran/winutils/blob/master/hadoop-2.7.1/bin/winutils.exe) from here into HADOOP_HOME\bin_
 
 
 We can also give a complete spark-submit script like

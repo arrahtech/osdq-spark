@@ -178,9 +178,13 @@ public class TransformRunner implements Serializable {
 		
 					if (isVerbose == true) {
 						for (String key: dataFramesMap.keySet()) {
+							if (key == null || "".equals(key)) {
+								System.out.println("Null Dataset");
+							} else {
 							System.out.println(key);
 							dataFramesMap.get(key).show();
 							//dataFramesMap.get(key).explain();;
+							}
 							
 						}
 					}
